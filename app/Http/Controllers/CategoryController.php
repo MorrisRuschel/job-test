@@ -35,7 +35,7 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store( Request $request )
     {
         $record              = new Category;
         $record->title       = $request->title;
@@ -50,9 +50,11 @@ class CategoryController extends Controller
      * @param  \App\Categories  $categories
      * @return \Illuminate\Http\Response
      */
-    public function show(Categories $categories)
+    public function show( Category $category )
     {
-        //
+        $record = Category::findOrFail( $category->id );
+
+        return view( 'categories.show', compact( 'record' ) );
     }
 
     /**
@@ -61,7 +63,7 @@ class CategoryController extends Controller
      * @param  \App\Categories  $categories
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit( Category $category )
     {
         $record = Category::findOrFail( $category->id );
 
@@ -75,9 +77,13 @@ class CategoryController extends Controller
      * @param  \App\Categories  $categories
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Categories $categories)
+    public function update( Request $request, Category $category )
     {
-        //
+        $record              = Category::findOrFail( $category->id );
+        $record->title       = $request->title;
+        $record->save();
+
+        return redirect()->route( 'categories.index' )->with( 'message', 'Registro atualizado com sucesso!');
     }
 
     /**
@@ -86,8 +92,11 @@ class CategoryController extends Controller
      * @param  \App\Categories  $categories
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Categories $categories)
+    public function destroy( Category $category )
     {
-        //
+        $record = Category::findOrFail( $category->id );
+        $record->delete();
+
+        return redirect()->route( 'categories.index' )->with( 'message', 'Registro removido com sucesso!' );
     }
 }

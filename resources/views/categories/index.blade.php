@@ -1,97 +1,39 @@
-<!doctype html>
-<html lang="{{ app()->getLocale() }}">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+@extends( 'template/main' )
 
-	<title>Notícias</title>
+@section( 'title', 'Categorias' )
 
-	<!-- Fonts -->
-	<link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
-	<!-- Styles -->
-	<style>
-		html, body {
-			background-color: #fff;
-			color: #636b6f;
-			font-family: 'Raleway', sans-serif;
-			font-weight: 100;
-			height: 100vh;
-			margin: 0;
-		}
-
-		.full-height {
-			height: 100vh;
-		}
-
-		.flex-center {
-			align-items: center;
-			display: flex;
-			justify-content: center;
-		}
-
-		.position-ref {
-			position: relative;
-		}
-
-		.top-right {
-			position: absolute;
-			right: 10px;
-			top: 18px;
-		}
-
-		.content {
-			text-align: center;
-		}
-
-		.title {
-			font-size: 84px;
-		}
-
-		.links > a {
-			color: #636b6f;
-			padding: 0 25px;
-			font-size: 12px;
-			font-weight: 600;
-			letter-spacing: .1rem;
-			text-decoration: none;
-			text-transform: uppercase;
-		}
-
-		.m-b-md {
-			margin-bottom: 30px;
-		}
-	</style>
-</head>
-<body>
-	<div class="flex-center position-ref full-height">
-		<div class="content">
-			<div class="title m-b-md">
-				Teste, estou indo bem.
+@section( 'content' )
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Título</th>
+								<th>Ações</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach ( $records as $record )
+							<tr>
+								<td>{{ $record->id }}</td>
+								<td>{{ $record->title }}</td>
+								<td class="text-nowrap">
+									<a href="/categories/{{ $record->id }}" class="btn btn-success">Visualizar</a>
+									<a href="/categories/{{ $record->id }}/edit" class="btn btn-info">Editar</a>
+									{{ Form::open( array( 'url' => 'categories/' . $record->id ) ) }}
+									    {{ Form::hidden('_method', 'DELETE') }}
+									    {{ Form::submit( 'Remover', array('class' => 'btn btn-warning')) }}
+									{{ Form::close() }}
+								</td>
+							</tr>
+							@endforeach
+						</tbody>
+					</table>
+				</div>
 			</div>
-
-			<table>
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Título</th>
-						<th></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach ( $records as $record )
-					<tr>
-						<td>{{ $record->id }}</td>
-						<td>{{ $record->title }}</td>
-						<td><a href="/categories/{{ $record->id }}/edit">Editar</a></td>
-						<td><a href="/categories/remove/{{ $record->id }}">Remover</a></td>
-					</tr>
-					@endforeach
-				</tbody>
-			</table>
 		</div>
 	</div>
-</body>
-</html>
+@endsection

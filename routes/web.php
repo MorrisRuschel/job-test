@@ -12,8 +12,12 @@
 */
 
 Route::get('/', function () {
-    return view('home');
+    return redirect('articles');
 });
 
-Route::resource( 'articles', 'ArticleController' );
-Route::resource( 'categories', 'CategoryController' );
+Route::resources( 
+	[
+		'articles' 	 => 'ArticleController',
+		'categories' => 'CategoryController'
+	]
+);

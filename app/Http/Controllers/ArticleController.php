@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Category;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
@@ -14,7 +15,7 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $records = Article::orderBy( 'created_at', 'desc' );
+        $records = Article::all();
 
         return view( 'articles.index', [ 'records' => $records ] );
     }
@@ -26,7 +27,9 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        return view( 'articles.save' );
+        $records = Category::pluck( 'title', 'id' )->all();
+
+        return view( 'articles.create', [ 'records' => $records ] );
     }
 
     /**
@@ -35,13 +38,16 @@ class ArticleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store( Request $request )
     {
         $record              = new Article;
         $record->category_id = $request->category_id;
         $record->title       = $request->title;
-        $record->description = $request->description;
+        $record->content     = $request->content;
         $record->save();
+
+        $image_name = $record->id . '.' . $request->file( 'image' )->getClientOriginalExtension();
+        $request->file( 'image' )->move( public_path( 'static/articles' ), $image_name );
 
         return redirect()->route( 'articles.index' )->with( 'message', 'Registro criado com sucesso!' );
     }
@@ -52,11 +58,12 @@ class ArticleController extends Controller
      * @param  \App\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function show(Articles $articles)
+    public function show( Article $article )
     {
-        $record = Article::findOrFail( $id );
+        $record  = Article::findOrFail( $article->id );
+        $records = Category::pluck( 'title', 'id' )->all();
 
-        return view( 'articles.edit', compact( 'article' ) );
+        return view( 'articles.show', [ 'record' => $record, 'records' => $records ] );
     }
 
     /**
@@ -65,11 +72,12 @@ class ArticleController extends Controller
      * @param  \App\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function edit(Articles $articles)
+    public function edit( Article $article )
     {
-        $record = Article::findOrFail( $id );
+        $record  = Article::findOrFail( $article->id );
+        $records = Category::pluck( 'title', 'id' )->all();
 
-        return view( 'articles.edit', compact( 'article' ) );
+        return view( 'articles.edit', [ 'record' => $record, 'records' => $records ] );
     }
 
     /**
@@ -79,13 +87,17 @@ class ArticleController extends Controller
      * @param  \App\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Articles $articles)
+    public function update( Request $request, Article $article )
     {
-        $record              = Article::findOrFail( $id );
+        $record              = Article::findOrFail( $article->id );
         $record->category_id = $request->category_id;
         $record->title       = $request->title;
-        $record->description = $request->description;
+        $record->content     = $request->content;
         $record->save();
+
+        //$image_name = $record->id . '.' . $request->file( 'image' )->getClientOriginalExtension();
+        $image_name = $record->id . '.jpg';
+        $request->file( 'image' )->move( public_path( 'static/articles' ), $image_name );
 
         return redirect()->route( 'articles.index' )->with( 'message', 'Registro atualizado com sucesso!');
     }
@@ -96,11 +108,11 @@ class ArticleController extends Controller
      * @param  \App\Articles  $articles
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Articles $articles)
+    public function destroy( Article $article )
     {
-        $record = Article::findOrFail( $id );
+        $record = Article::findOrFail( $article->id );
         $record->delete();
 
-        return redirect()->route( 'articles.index' )->with( 'alert-success', 'Registro removido com sucesso!' );
+        return redirect()->route( 'articles.index' )->with( 'message', 'Registro removido com sucesso!' );
     }
 }
